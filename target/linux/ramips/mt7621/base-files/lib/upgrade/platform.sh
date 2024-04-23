@@ -9,24 +9,7 @@ RAMFS_COPY_BIN='fw_printenv fw_setenv'
 RAMFS_COPY_DATA='/etc/fw_env.config /var/lock/fw_printenv.lock'
 
 platform_check_image() {
-	local board=$(board_name)
-	case "$board" in
-	xwrt,wr1800k-ax-norplusemmc)
-		norplusemmc_check_image "$1"
-		return $?
-		;;
-	esac
-
 	return 0
-}
-
-platform_copy_config() {
-	local board=$(board_name)
-	case "$board" in
-	xwrt,wr1800k-ax-norplusemmc)
-		norplusemmc_copy_config
-		;;
-	esac
 }
 
 platform_do_upgrade() {
@@ -56,6 +39,7 @@ platform_do_upgrade() {
 	mikrotik,routerboard-m33g)
 		[ "$(rootfs_type)" = "tmpfs" ] && mtd erase firmware
 		;;
+	beeline,smartbox-giga|\
 	asus,rt-ac65p|\
 	asus,rt-ac85p)
 		echo "Backing up firmware"
@@ -72,24 +56,16 @@ platform_do_upgrade() {
 	asus,rt-ac85p|\
 	asus,rt-ax53u|\
 	beeline,smartbox-flash|\
-	beeline,smartbox-giga|\
-	beeline,smartbox-turbo|\
-	belkin,rt1800|\
 	dlink,dir-1960-a1|\
 	dlink,dir-2640-a1|\
 	dlink,dir-2660-a1|\
 	dlink,dir-853-a3|\
-	h3c,tx1800-plus|\
-	h3c,tx1801-plus|\
-	h3c,tx1806|\
-	haier,har-20s2u1|\
 	hiwifi,hc5962|\
 	iptime,a3004t|\
 	iptime,ax2004m|\
 	iptime,t5004|\
 	jcg,q20|\
 	linksys,e5600|\
-	linksys,e7350|\
 	linksys,ea6350-v4|\
 	linksys,ea7300-v1|\
 	linksys,ea7300-v2|\
@@ -113,28 +89,16 @@ platform_do_upgrade() {
 	raisecom,msg1500-x-00|\
 	sercomm,na502|\
 	sercomm,na502s|\
-	sim,simax1800t|\
-	xiaomi,mi-router-cr6606|\
-	xiaomi,mi-router-cr6608|\
-	xiaomi,mi-router-cr6609|\
-	xiaomi,mi-router-cr660x|\
-	xwrt,nxc2009e-v100|\
-	xwrt,fm10-ax-nand|\
-	xwrt,wr1800k-ax-nand|\
-	zyxel,nwa50ax|\
-	zyxel,nwa55axe)
-		nand_do_upgrade "$1"
-		;;
 	xiaomi,mi-router-3g|\
 	xiaomi,mi-router-3-pro|\
 	xiaomi,mi-router-4|\
 	xiaomi,mi-router-ac2100|\
-	xiaomi,redmi-router-ac2100)
-		# this make it compatible with breed
-		dd if=/dev/mtd0 bs=64 count=1 2>/dev/null | grep -qi breed && CI_KERNPART_EXT="kernel_stock"
-		dd if=/dev/mtd7 bs=64 count=1 2>/dev/null | grep -o MIPS.*Linux | grep -qi X-WRT && CI_KERNPART_EXT="kernel_stock"
-		dd if=/dev/mtd7 bs=64 count=1 2>/dev/null | grep -o MIPS.*Linux | grep -qi NATCAP && CI_KERNPART_EXT="kernel0_rsvd"
-		dd if=/dev/mtd0 2>/dev/null | grep -qi pb-boot && CI_KERNPART_EXT="kernel_stock"
+	xiaomi,mi-router-cr6606|\
+	xiaomi,mi-router-cr6608|\
+	xiaomi,mi-router-cr6609|\
+	xiaomi,redmi-router-ac2100|\
+	zyxel,nwa50ax|\
+	zyxel,nwa55axe)
 		nand_do_upgrade "$1"
 		;;
 	iodata,wn-ax1167gr2|\
@@ -150,14 +114,8 @@ platform_do_upgrade() {
 		;;
 	ubnt,edgerouter-x|\
 	ubnt,edgerouter-x-sfp)
-		CI_KERNPART="kernel1"
-		CI_KERNPART_EXT="kernel2"
-		nand_do_upgrade "$1"
+		platform_upgrade_ubnt_erx "$1"
 		;;
-	xwrt,wr1800k-ax-norplusemmc)
-		norplusemmc_do_upgrade "$1"
-		;;
-	zyxel,lte3301-plus|\
 	zyxel,nr7101)
 		fw_setenv CheckBypass 0
 		fw_setenv Image1Stable 0
