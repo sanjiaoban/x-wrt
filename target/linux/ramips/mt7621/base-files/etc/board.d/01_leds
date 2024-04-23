@@ -157,6 +157,7 @@ zbtlink,zbt-wg1608-16m)
 	ucidef_set_led_netdev "lan4" "LAN4" "green:lan-4" "lan4"
 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "wan"
 	;;
+huasifei,ws7915-32|\
 huasifei,ws7915)
 	ucidef_set_led_netdev "wlan2g" "wlan2g" "wlan0" "wlan0" "link tx rx"
 	ucidef_set_led_netdev "wlan5g" "wlan5g" "wlan1" "wlan1" "link tx rx"
